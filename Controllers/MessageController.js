@@ -3,7 +3,7 @@ const amqp = require('amqplib/callback_api');
 const { v4: uuidv4 } = require('uuid');
 
 const sendMessage = async (req, res) => {
-    const { message } = req.body;
+    const { message, bot_id } = req.body;
 
     // Establish connection to RabbitMQ
     amqp.connect('amqp://localhost', function (error0, connection) {
@@ -42,7 +42,7 @@ const sendMessage = async (req, res) => {
                 }, { noAck: true });
 
                 // Send the message to the request queue
-                const messageToSend = { question: message, correlationId };
+                const messageToSend = { question: message, correlationId, bot_id: bot_id };
                 console.log('Sending message:', messageToSend);
                 channel.sendToQueue('message_completion_request', Buffer.from(JSON.stringify(messageToSend)));
             });
