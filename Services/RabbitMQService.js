@@ -22,20 +22,21 @@ class RabbitMQService {
         return this.channel.assertQueue(queue, options);
     }
 
-    async sendMessage(queue, message, options = {}) {
+    async sendMessage(queue, message) {
         await this.connect();
         await this.assertQueue(queue);
-        await this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), options);
+        await this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
         console.log(`[x] Sent message to queue '${queue}': ${JSON.stringify(message)}`);
     }
 
     async receiveMessage(queue, callback) {
         await this.connect();
-        await this.assertQueue(queue);
+        await this.assertQueue(queue, { durable: true });
         this.channel.consume(queue, (msg) => {
             if (msg !== null) {
-                console.log(`MSG from queue ${queue}:`, msg.content.toString());
-                callback(msg.content.toString());
+                const response = JSON.parse(msg.content.toString());
+
+                callback(response.bot_id);
                 this.channel.ack(msg);
             }
         });

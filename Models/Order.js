@@ -51,7 +51,8 @@ const createOrder = async (userId, packageId, unitPrice, domain) => {
 
         const formattedDate = convertToTimeZone(orderWithDetails.createdate, 'Asia/Damascus');
 
-        RabbitMQService.sendMessage('training_queue', JSON.stringify(bot));
+        RabbitMQService.sendMessage('training_request', JSON.stringify(bot));
+        
 
         return {
             id: orderWithDetails.id,

@@ -11,6 +11,7 @@ const { fetchBots } = require('./Controllers/Bot');
 const { fetchUserOrders } = require('./Controllers/FetchOrders');
 const { sendMessage, handleResponse } = require('./Controllers/MessageController');
 const RabbitMQService = require('./Services/RabbitMQService');
+const { generateJsFile } = require('./Models/Bot');
 
 
 dotenv.config();
@@ -39,7 +40,7 @@ app.listen(port, async () => {
     try {
         await RabbitMQService.connect();
         // add all consumers here
-        RabbitMQService.receiveMessage('response_queue', handleResponse);
+        RabbitMQService.receiveMessage('training_response', generateJsFile);
     } catch (error) {
         console.error('Error connecting to RabbitMQ:', error);
     }

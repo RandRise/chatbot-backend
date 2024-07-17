@@ -72,9 +72,14 @@ const updateBotStatus = async (botId, newStatus) => {
     }
 };
 
-
+const generateJsFile = async (botId) => {
+    //Genrating JS Vanilla File
+    await updateBotStatus(botId, newStatus = 1) //This will mark bot as Ready
+    // Sending notification to user
+}
 module.exports = {
     getBotById,
     getBots,
     updateBotStatus,
+    generateJsFile,
 };
