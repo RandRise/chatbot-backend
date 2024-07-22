@@ -12,6 +12,7 @@ const { fetchUserOrders } = require('./Controllers/FetchOrders');
 const { sendMessage, handleResponse } = require('./Controllers/MessageController');
 const RabbitMQService = require('./Services/RabbitMQService');
 const { generateJsFile } = require('./Models/Bot');
+const { registerSessionKey } = require('./Controllers/SessionController');
 
 
 dotenv.config();
@@ -34,6 +35,7 @@ app.post('/recharge-bot', verifyToken, rechargeBotController);
 app.get('/get-bots', verifyToken, fetchBots);
 app.get('/get-orders', verifyToken, fetchUserOrders);
 app.post('/send-message', sendMessage);
+app.post('/register-session-key', registerSessionKey);
 
 app.listen(port, async () => {
     console.log(`Server running on port ${port}`);
@@ -41,6 +43,7 @@ app.listen(port, async () => {
         await RabbitMQService.connect();
         // add all consumers here
         RabbitMQService.receiveMessage('training_response', generateJsFile);
+        
     } catch (error) {
         console.error('Error connecting to RabbitMQ:', error);
     }

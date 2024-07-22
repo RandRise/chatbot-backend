@@ -19,10 +19,10 @@ const register = async (req, res) => {
 
         const token = await loginUser(user.id)
 
-        res.status(200).json(createResponse(200, 'User Created Successfully', token, user));
+        return res.status(200).json(createResponse(200, 'User Created Successfully', token, user));
     } catch (error) {
         console.error(error);
-        res.status(500).json(createResponse(500, 'Server Error', error.message, null))
+        return res.status(500).json(createResponse(500, 'Server Error', error.message, null))
     }
 };
 
@@ -44,10 +44,10 @@ const login = async (req, res) => {
 
         const token = await loginUser(user.id);
 
-        res.json(createResponse(200, 'Login successful', { token: token, userId: user.id }));
+        return res.json(createResponse(200, 'Login successful', { token: token, userId: user.id }));
     } catch (error) {
         console.error(error);
-        res.status(500).json(createResponse(500, 'Server error', error.message, null));
+        return res.status(500).json(createResponse(500, 'Server error', error.message, null));
     }
 };
 
@@ -55,10 +55,10 @@ const requestPasswordReset = async (req, res) => {
     const { email } = req.body;
     try {
         await sendResetCode(email);
-        res.status(200).json(createResponse(200, 'Reset code sent to email', null));
+        return res.status(200).json(createResponse(200, 'Reset code sent to email', null));
     } catch (error) {
         console.error(error);
-        res.status(500).json(createResponse(500, 'Server error', error.message, null));
+        return res.status(500).json(createResponse(500, 'Server error', error.message, null));
     }
 };
 
@@ -66,10 +66,10 @@ const resetPassword = async (req, res) => {
     const { email, resetCode, newPassword } = req.body;
     try {
         const response = await verifyResetCodeAndChangePassword(email, resetCode, newPassword);
-        res.status(200).json(createResponse(200, response.message));
+        return res.status(200).json(createResponse(200, response.message));
     } catch (error) {
         console.error(error);
-        res.status(500).json(createResponse(500, 'Server Error', error.message));
+        return res.status(500).json(createResponse(500, 'Server Error', error.message));
     }
 };
 

@@ -6,9 +6,9 @@ const createOrder = async (req, res) => {
 
     try {
         const order = await placeOrder(userId, packageId, domain);
-        res.status(200).json(createResponse(200, 'Order created successfully', order));
+        return res.status(200).json(createResponse(200, 'Order created successfully', order));
     } catch (error) {
-        res.status(500).json(createResponse(500, 'Failed to place order', error.message));
+        return res.status(500).json(createResponse(500, 'Failed to place order', error.message));
     };
 
 };

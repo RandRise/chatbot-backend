@@ -35,7 +35,7 @@ class RabbitMQService {
         this.channel.consume(queue, (msg) => {
             if (msg !== null) {
                 const response = JSON.parse(msg.content.toString());
-
+                console.log("Received Message",msg.content.toString());
                 callback(response.bot_id);
                 this.channel.ack(msg);
             }

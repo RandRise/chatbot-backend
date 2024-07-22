@@ -9,10 +9,10 @@ const fetchBots = async (req, res) => {
         if (bots.length === 0) {
             return res.status(404).json(createResponse(404, 'No bots found', []));
         }
-        res.status(200).json(createResponse(200, 'Bots Fetched', bots));
+        return res.status(200).json(createResponse(200, 'Bots Fetched', bots));
     } catch (error) {
         console.error('Error fetching bots:', error);
-        res.status(500).json(createResponse(500, 'Server Error', null));
+        return res.status(500).json(createResponse(500, 'Server Error', null));
     }
 };
 
