@@ -10,17 +10,14 @@ const insertMessage = async (sessionKey, content, type) => {
     return rows[0];
 };
 
-const getLastMessages = async (sessionKey, limit = 5) => {
+const getLastMessages = async (sessionKey, limit = 7) => {
     const query = `
         SELECT * FROM messages 
         WHERE session_key = $1 
         ORDER BY id DESC LIMIT $2`;
+
     const values = [sessionKey, limit];
     const { rows } = await db.query(query, values);
-    // Sort the rows again in descending order based on id to ensure correct order
-    const sortedRows = rows.sort((a, b) => a.id - b.id);
-    console.log("Rows sorted again in DESC order: ", sortedRows);
-    console.log("Rows ", rows);
     return rows;
 };
 

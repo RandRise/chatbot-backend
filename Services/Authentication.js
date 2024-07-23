@@ -4,18 +4,22 @@ const bcrypt = require('bcrypt');
 const { getUserByEmail, createUser, updateUserVerificationCode, updateUserPassword } = require('../Models/User');
 
 const generateNumericCode = (length) => {
+
     let code = '';
     for (let i = 0; i < length; i++) {
-        code += Math.floor(Math.random() * 10); // Append a random digit (0-9)
+        code += Math.floor(Math.random() * 10);
     }
     return code;
 };
 
 const registerUser = async (firstname, lastname, email, hashedPassword) => {
     try {
+
         const user = await createUser(firstname, lastname, email, hashedPassword);
         return user;
+
     } catch (error) {
+
         console.error(error);
         throw new Error('Server error');
     }
@@ -24,24 +28,28 @@ const registerUser = async (firstname, lastname, email, hashedPassword) => {
 const loginUser = async (userid) => {
 
     try {
+
         const token = jwt.sign({ id: userid }, process.env.JWT_SECRET, { expiresIn: '1y' });
-        return ( token );
+        return (token);
+
     } catch (error) {
+
         console.error(error);
         throw 'Server error';
     }
 };
 
 const sendResetCode = async (email) => {
+
     const user = await getUserByEmail(email);
     if (!user) {
+
         throw new Error('User not found');
     }
 
     const resetCode = generateNumericCode(6);
     await updateUserVerificationCode(email, resetCode);
 
-    // Use nodemailer to send the email
     const transporter = nodemailer.createTransport({
         host: "smtp.strato.de",
         port: 587,
@@ -53,6 +61,7 @@ const sendResetCode = async (email) => {
     });
 
     const mailOptions = {
+
         from: process.env.EMAIL_USER,
         to: email,
         subject: 'Password Reset Code',
@@ -60,13 +69,14 @@ const sendResetCode = async (email) => {
     };
 
     await transporter.sendMail(mailOptions);
-
     return { message: 'Reset code sent to email' };
 };
 
 const verifyResetCodeAndChangePassword = async (email, resetCode, newPassword) => {
+
     const user = await getUserByEmail(email);
     if (!user || user.verification_code !== resetCode) {
+
         throw new Error('Invalid reset code');
     }
 

@@ -9,10 +9,12 @@ const verifyToken = (req, res, next) => {
 
     }
     try {
+
         const verified = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET)
         req.user = verified;
         next();
     } catch (error) {
+
         return res.status(401).json(createResponse(401, 'Invalid Token', null));
     }
 };

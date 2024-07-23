@@ -1,10 +1,9 @@
 const moment = require('moment-timezone');
 
 const retrieveCurrency = () => {
+    
     return "USD";
 }
-
-
 
 const convertToTimeZone = (utcDateTime, targetTimeZone) => {
     return moment.utc(utcDateTime)

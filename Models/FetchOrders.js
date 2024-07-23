@@ -2,7 +2,9 @@ const { query } = require('../db');
 const { convertToTimeZone } = require('../Utils/helper');
 
 const getOrdersByUserId = async (userId) => {
+    
     try {
+
         const queryText = `
             SELECT 
                 o.id AS order_id,
@@ -22,6 +24,7 @@ const getOrdersByUserId = async (userId) => {
         const result = await query(queryText, [userId]);
 
         const orders = result.rows.map(row => ({
+
             id: Number(row.order_id),
             package_id: Number(row.package_id),
             unitprice: parseFloat(row.unitprice),
@@ -29,6 +32,7 @@ const getOrdersByUserId = async (userId) => {
             package_name: row.package_name,
             msgcount: row.msgcount,
             numofmonths: row.numofmonths
+
         }));
 
         return orders;

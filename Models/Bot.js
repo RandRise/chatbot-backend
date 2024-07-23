@@ -2,6 +2,7 @@ const { query } = require('../db');
 const { convertToTimeZone } = require('../Utils/helper');
 
 const getBotById = async (botId) => {
+
     const result = await query('SELECT * FROM bots WHERE id = $1', [botId]);
     return result.rows[0];
 };
@@ -26,14 +27,17 @@ const getBots = async (userId) => {
         const result = await query(queryText, [userId]);
 
         const bots = result.rows.reduce((acc, row) => {
+
             const existingBot = acc.find(bot => bot.id === row.bot_id);
             if (existingBot) {
+
                 existingBot.subscriptions.push({
                     id: Number(row.subscription_id),
                     msgcount: Number(row.msgcount),
                     expirydate: convertToTimeZone(row.expirydate, 'Asia/Damascus')
                 });
             } else {
+
                 acc.push({
                     id: Number(row.bot_id),
                     domain: row.domain,
@@ -47,17 +51,20 @@ const getBots = async (userId) => {
                         : []
                 });
             }
+
             return acc;
         }, []);
 
         return bots;
     } catch (error) {
+
         console.error('Error fetching bots:', error);
         throw error;
     }
 };
 
 const updateBotStatus = async (botId, newStatus) => {
+
     try {
         const updateQuery = `
             UPDATE bots
@@ -73,9 +80,11 @@ const updateBotStatus = async (botId, newStatus) => {
 };
 
 const generateJsFile = async (botId) => {
-    //Genrating JS Vanilla File
+
+    //Genrating JS Vanilla File (Working on it)
+    
     await updateBotStatus(botId, newStatus = 1) //This will mark bot as Ready
-    // Sending notification to user
+
 }
 module.exports = {
     getBotById,
