@@ -33,7 +33,7 @@ const rechargeBot = async (botId, packageId) => {
     const formattedExpiryDate = convertToTimeZone(newExpiryDate, 'Asia/Damascus');
 
     return {
-        
+
         subscription_id: updatedSubscription.id,
         bot_id: updatedSubscription.bot_id,
         new_msgcount: newMsgCount,
@@ -41,6 +41,31 @@ const rechargeBot = async (botId, packageId) => {
     };
 };
 
+const validateSubscriptionAndManageQuota = async (botId) => {
+    try {
+        const currentSubscription = await getCurrentSubscription(botId);
+        const now = moment.utc();
+        const currentExpiryDate = moment(currentSubscription.expirydate);
+        console.log("Expiration Date UTC",currentExpiryDate);
+        console.log("Now", now)
+
+        if (now.isAfter(currentExpiryDate)){
+            console.log("Subscription Expired");
+            return false;
+        }
+        if (currentSubscription && currentSubscription.msgcount > 0) {
+            const newMsgCount = currentSubscription.msgcount - 1;
+            await updateSubscription(currentSubscription.id, newMsgCount, currentSubscription.expirydate);
+            console.log(`[x] Decreased message count for bot_id: ${botId}`);
+        } else {
+            console.log(`No active subscription found or Quota exceeded for Web-Bot number: ${botId}`);
+        }
+    } catch (err) {
+        console.error("Error decreasing message count:", err);
+    }
+};
+
 module.exports = {
     rechargeBot,
+    validateSubscriptionAndManageQuota,
 };

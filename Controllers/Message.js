@@ -3,6 +3,7 @@ const amqp = require('amqplib/callback_api');
 const { v4: uuidv4 } = require('uuid');
 const { insertMessage, getLastMessages } = require('../Models/Message');
 const { getSessionBySessionkey } = require('../Models/Session');
+const { validateSubscriptionAndManageQuota } = require('../Services/Subscription')
 
 const sendMessage = async (req, res) => {
 
@@ -14,6 +15,11 @@ const sendMessage = async (req, res) => {
 
             return res.status(500).json(createResponse(500, 'Session not found.', {}));
         }
+
+        const validationResponse = await validateSubscriptionAndManageQuota(session.bot_id);
+        if (validationResponse == false)
+            return res.status(500).json(createResponse(500, 'Something wrong. Please contact website support', {}));
+
         await insertMessage(session_key, message, 1);
 
         const lastMessages = await getLastMessages(session_key);

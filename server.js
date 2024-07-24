@@ -9,11 +9,10 @@ const { createOrder } = require('./Controllers/Order');
 const { rechargeBotController } = require('./Controllers/Subscription');
 const { fetchBots } = require('./Controllers/Bot');
 const { fetchUserOrders } = require('./Controllers/FetchOrders');
-const { sendMessage } = require('./Controllers/MessageController');
+const { sendMessage } = require('./Controllers/Message');
 const RabbitMQService = require('./Services/RabbitMQService');
 const { generateJsFile } = require('./Models/Bot');
-const { registerSessionKey } = require('./Controllers/SessionController');
-
+const { registerSessionKey } = require('./Controllers/Session');
 dotenv.config();
 
 const app = express();

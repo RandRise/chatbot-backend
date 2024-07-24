@@ -1,5 +1,5 @@
 const amqp = require('amqplib');
-
+const { reduceMessageCount } = require('../Services/Subscription')
 class RabbitMQService {
     constructor() {
 
@@ -25,14 +25,6 @@ class RabbitMQService {
         return this.channel.assertQueue(queue, options);
     }
 
-    async sendMessage(queue, message) {
-
-        await this.connect();
-        await this.assertQueue(queue);
-        await this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
-        console.log(`[x] Sent message to queue '${queue}': ${JSON.stringify(message)}`);
-    }
-
     async receiveMessage(queue, callback) {
 
         await this.connect();
@@ -44,6 +36,7 @@ class RabbitMQService {
                 callback(response.bot_id);
                 this.channel.ack(msg);
             }
+
         });
         console.log(`[*] Waiting for messages in '${queue}'`);
     }

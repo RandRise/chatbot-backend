@@ -1,4 +1,3 @@
-// Models/Message.js
 const db = require('../db');
 
 const insertMessage = async (sessionKey, content, type) => {
