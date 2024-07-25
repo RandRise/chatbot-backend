@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { register, login, requestPasswordReset, resetPassword } = require('./Controllers/Authentication');
-const verifyToken = require('./middleware/Auth');
+const verifyToken = require('./Middleware/Auth');
 const { fetchPackages } = require('./Controllers/Package');
 const { createOrder } = require('./Controllers/Order');
 const { rechargeBotController } = require('./Controllers/Subscription');
@@ -13,6 +13,7 @@ const { sendMessage } = require('./Controllers/Message');
 const RabbitMQService = require('./Services/RabbitMQService');
 const { generateJsFile } = require('./Models/Bot');
 const { registerSessionKey } = require('./Controllers/Session');
+const { fetchAllMessages } = require('./Models/Message')
 dotenv.config();
 
 const app = express();
@@ -33,7 +34,7 @@ app.get('/get-bots', verifyToken, fetchBots);
 app.get('/get-orders', verifyToken, fetchUserOrders);
 app.post('/send-message', sendMessage);
 app.post('/register-session-key', registerSessionKey);
-
+app.get('/fetch-all-messages', fetchAllMessages);
 app.listen(port, async () => {
     console.log(`Server running on port ${port}`);
     try {

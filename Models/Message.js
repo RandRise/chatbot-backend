@@ -20,7 +20,19 @@ const getLastMessages = async (sessionKey, limit = 7) => {
     return rows;
 };
 
+const fetchAllMessages = async (sessionKey) => {
+    const query = `
+        SELECT * FROM messages
+        WHERE session_key = $1
+        ORDER BY timestamp ASC`;
+
+    const values = [sessionKey];
+    const { rows } = await db.query(query, values);
+    return rows;
+};
+
 module.exports = {
     insertMessage,
     getLastMessages,
+    fetchAllMessages
 };

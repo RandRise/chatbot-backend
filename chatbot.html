@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        #chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #chat-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        #chat-footer {
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-top: 1px solid #ccc;
+            display: flex;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #chat-send {
+            margin-left: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #f1f1f1;
+            color: #000;
+        }
+
+        .chat-message.user {
+            background-color: #007bff;
+            color: #fff;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-container">
+        <div id="chat-header">Chat with Us</div>
+        <div id="chat-body"></div>
+        <div id="chat-footer">
+            <input type="text" id="chat-input" placeholder="Type your message...">
+            <button id="chat-send">Send</button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const botId = '198';  // Replace with your bot ID
+            const apiUrl = 'http://localhost:3000/send-message';  // Replace with your API URL
+            const registerUrl = 'http://localhost:3000/register-session-key';
+            const fetchAllMessages = 'http://localhost:300/fetch-all-messages';
+            const sessionKeyStorageKey = 'chatbot_session_key';  // Key for local storage
+
+            let sessionKey;
+            let sessionInitialized = false;
+
+            // Generate a random session key
+            function generateSessionKey(length = 16) {
+                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let sessionKey = '';
+                for (let i = 0; i < length; i++) {
+                    const randomIndex = Math.floor(Math.random() * characters.length);
+                    sessionKey += characters[randomIndex];
+                }
+                return sessionKey;
+            }
+
+            // Register the session key with the server
+            function registerSessionKey(botId, sessionKey) {
+                return fetch(registerUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ bot_id: botId, session_key: sessionKey })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        localStorage.setItem(sessionKeyStorageKey, sessionKey);
+                        return sessionKey;
+                    } else {
+                        throw new Error('Failed to register session key: ' + data.message);
+                    }
+                });
+            }
+
+            // Initialize the session
+            function initializeSession() {
+                sessionKey = localStorage.getItem(sessionKeyStorageKey);
+
+                if (!sessionKey) {
+                    // No session key in local storage, generate and register a new one
+                    sessionKey = generateSessionKey();
+                    return registerSessionKey(botId, sessionKey)
+                        .then(registeredSessionKey => {
+                            sessionKey = registeredSessionKey;
+                            sessionInitialized = true;
+                            console.log('Session key initialized:', sessionKey);
+                        })
+                        .catch(error => {
+                            console.error('Error initializing session:', error);
+                        });
+                } else {
+                    sessionInitialized = true;
+                    console.log('Using existing session key:', sessionKey);
+                    return Promise.resolve(sessionKey);
+                }
+            }
+
+            // Initialize session on page load
+            initializeSession().then(() => {
+                const chatBody = document.getElementById('chat-body');
+                const chatInput = document.getElementById('chat-input');
+                const chatSend = document.getElementById('chat-send');
+
+                chatSend.addEventListener('click', function () {
+                    if (!sessionInitialized) {
+                        console.error('Session is not initialized yet.');
+                        return;
+                    }
+
+                    const message = chatInput.value;
+                    if (message.trim()) {
+                        addMessage('user', message);
+                        chatInput.value = '';
+                        sendMessageToBot(message);
+                    }
+                });
+
+                function addMessage(role, message) {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'chat-message ' + role;
+                    messageElement.innerText = message;
+                    chatBody.appendChild(messageElement);
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                }
+
+                function sendMessageToBot(message) {
+                    if (!sessionKey) {
+                        console.error('Session key is not initialized.');
+                        return;
+                    }
+
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message: message, session_key: sessionKey })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            addMessage('bot', data.data.answer);
+                        } else {
+                            console.error('Error from server:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending message to bot:', error);
+                    });
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

@@ -82,8 +82,8 @@ const updateBotStatus = async (botId, newStatus) => {
 const generateJsFile = async (botId) => {
 
     //Genrating JS Vanilla File (Working on it)
-    
-    await updateBotStatus(botId, newStatus = 1) //This will mark bot as Ready
+
+    await updateBotStatus(botId, newStatus = 1)
 
 }
 module.exports = {
