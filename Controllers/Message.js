@@ -1,7 +1,7 @@
 const { createResponse } = require('../Utils/responseUtils');
 const amqp = require('amqplib/callback_api');
 const { v4: uuidv4 } = require('uuid');
-const { insertMessage, getLastMessages } = require('../Models/Message');
+const { insertMessage, getLastMessages, fetchAllMessages } = require('../Models/Message');
 const { getSessionBySessionkey } = require('../Models/Session');
 const { validateSubscriptionAndManageQuota } = require('../Services/Subscription')
 
@@ -81,12 +81,27 @@ const sendMessage = async (req, res) => {
         return res.status(500).json(createResponse(500, 'Failed to process message', {}));
     }
 
+
+
     function generateUuid() {
 
         return uuidv4();
     }
 };
 
+const fetchAllMessagesController = async (req, res) => {
+    const { session_key } = req.body;
+
+    try {
+        const messages = await fetchAllMessages(session_key);
+        return res.status(200).json(createResponse(200, 'Messages fetched successfully.', { messages }));
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        return res.status(500).json(createResponse(500, 'Failed to fetch messages', {}));
+    }
+};
+
 module.exports = {
     sendMessage,
+    fetchAllMessagesController
 };

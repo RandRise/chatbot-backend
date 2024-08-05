@@ -1,5 +1,5 @@
 const { createResponse } = require("../Utils/responseUtils");
-const { insertSession, getSessionKeyByBotId } = require('../Models/Session');
+const { insertSession } = require('../Models/Session');
 const registerSessionKey = async (req, res) => {
 
     const { bot_id, session_key } = req.body;

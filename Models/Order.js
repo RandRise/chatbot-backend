@@ -11,6 +11,7 @@ const isValidDomain = (domain) => {
     return domainPattern.test(domain);
 };
 
+
 const createOrder = async (userId, packageId, unitPrice, domain) => {
     try {
 
@@ -67,7 +68,7 @@ const createOrder = async (userId, packageId, unitPrice, domain) => {
 
 
         return {
-            
+
             id: orderWithDetails.id,
             user_id: orderWithDetails.user_id,
             package_id: orderWithDetails.package_id,

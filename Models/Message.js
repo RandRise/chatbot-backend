@@ -23,8 +23,7 @@ const getLastMessages = async (sessionKey, limit = 7) => {
 const fetchAllMessages = async (sessionKey) => {
     const query = `
         SELECT * FROM messages
-        WHERE session_key = $1
-        ORDER BY timestamp ASC`;
+        WHERE session_key = $1`;
 
     const values = [sessionKey];
     const { rows } = await db.query(query, values);
