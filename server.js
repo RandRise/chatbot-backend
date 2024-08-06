@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path')
 const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -17,6 +18,7 @@ const { fetchAllMessagesController } = require('./Controllers/Message')
 dotenv.config();
 
 const app = express();
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

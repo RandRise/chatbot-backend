@@ -259,7 +259,7 @@
         }).then(response => response.json())
           .then(data => {
               if (data.code === 200) {
-                  localStorage.setItem(sessionKeyStorageKey, sessionKey);
+                  localStorage.setItem("BotID" + botId + "_"  + sessionKeyStorageKey, sessionKey);
                   return sessionKey;
               } else {
                   throw new Error('Failed to register session key: ' + data.message);
@@ -311,7 +311,7 @@
     }
 
     function initializeSession() {
-        sessionKey = localStorage.getItem(sessionKeyStorageKey);
+        sessionKey = localStorage.getItem("BotID" + botId + "_"  + sessionKeyStorageKey);
 
         if (!sessionKey) {
             sessionKey = generateSessionKey();
@@ -370,7 +370,5 @@
         }
     });
 
-    initializeSession().then(() => {
-        fetchMessages().catch(error => console.error('Error fetching messages:', error));
-    });
+    initializeSession();
 })();
