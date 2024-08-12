@@ -70,7 +70,7 @@ const requestPasswordReset = async (req, res) => {
     } catch (error) {
 
         console.error(error);
-        return res.status(500).json(createResponse(500, 'Server error', error.message, null));
+        return res.status(500).json(createResponse(500, 'Invalid Email', error.message, null));
     }
 };
 
@@ -84,7 +84,7 @@ const resetPassword = async (req, res) => {
     } catch (error) {
 
         console.error(error);
-        return res.status(500).json(createResponse(500, 'Server Error', error.message));
+        return res.status(500).json(createResponse(500, 'Invalid Email Or Reset Code', error.message));
     }
 };
 
