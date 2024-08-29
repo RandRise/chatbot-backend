@@ -234,7 +234,7 @@
         let sessionKey;
         let sessionInitialized = false;
     
-        const botId = 212;
+        const botId = 219;
         const chatBody = document.getElementById('chat-body');
         const chatInput = document.getElementById('chat-input');
         const chatSend = document.getElementById('chat-send');
@@ -340,10 +340,16 @@
     
             sendMessage(message, sessionKey)
                 .then(response => {
+                    if(response.code === 200) {
+
                     addMessage('bot', response.data.answer);
+                    } else {
+                     addMessage('bot', response.message);
+                    }
                 })
                 .catch(error => {
                     console.error('Error sending message to bot:', error);
+                    addMessage('bot', 'An error occurred while communicating with the server.');
                 })
                 .finally(() => {
                     toggleUI(false);

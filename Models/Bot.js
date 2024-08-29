@@ -80,6 +80,7 @@ const updateBotStatus = async (botId, newStatus) => {
     }
 };
 
+
 const generateJsFile = async (botId) => {
 
     //Genrating JS Vanilla File (Working on it)
@@ -426,10 +427,16 @@ const generateJsFile = async (botId) => {
     
             sendMessage(message, sessionKey)
                 .then(response => {
+                    if(response.code === 200) {
+
                     addMessage('bot', response.data.answer);
+                    } else {
+                     addMessage('bot', response.message);
+                    }
                 })
                 .catch(error => {
                     console.error('Error sending message to bot:', error);
+                    addMessage('bot', 'An error occurred while communicating with the server.');
                 })
                 .finally(() => {
                     toggleUI(false);

@@ -1,6 +1,6 @@
 const { getBots } = require('../Models/Bot');
 const { createResponse } = require('../Utils/responseUtils');
-
+const { retrainBot } = require('../Models/Order');
 const fetchBots = async (req, res) => {
 
     const userId = req.user.id;
@@ -22,6 +22,20 @@ const fetchBots = async (req, res) => {
     }
 };
 
+const retrainChatbot = async (req, res) => {
+    const { botId } = req.body;
+    try {
+        console.log("BOT ID", botId)
+        await retrainBot(botId);
+        return res.status(200).json(createResponse(200, 'Your bot is up to date', null));
+    } catch (error) {
+
+        console.error('Error bots:', error);
+        return res.status(500).json(createResponse(500, 'Error updating bot', null));
+    }
+}
+
 module.exports = {
     fetchBots,
+    retrainChatbot
 };

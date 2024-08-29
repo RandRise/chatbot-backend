@@ -51,7 +51,7 @@ const login = async (req, res) => {
 
         const token = await loginUser(user.id);
 
-        return res.json(createResponse(200, 'Login successful', { token: token, userId: user.id }));
+        return res.json(createResponse(200, 'Login successful', { token: token, userId: user.id, role: user.role }));
     } catch (error) {
 
         console.error(error);

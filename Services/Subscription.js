@@ -53,12 +53,14 @@ const validateSubscriptionAndManageQuota = async (botId) => {
             console.log("Subscription Expired");
             return false;
         }
+        console.log("Current Subscription",currentSubscription);
         if (currentSubscription && currentSubscription.msgcount > 0) {
             const newMsgCount = currentSubscription.msgcount - 1;
             await updateSubscription(currentSubscription.id, newMsgCount, currentSubscription.expirydate);
             console.log(`[x] Decreased message count for bot_id: ${botId}`);
         } else {
             console.log(`No active subscription found or Quota exceeded for Web-Bot number: ${botId}`);
+            return false;
         }
     } catch (err) {
         console.error("Error decreasing message count:", err);

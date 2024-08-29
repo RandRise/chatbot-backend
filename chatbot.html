@@ -222,6 +222,7 @@
     </div>
 
     <script>
+
         (function () {
             const sendMessageUrl = 'http://localhost:3000/send-message';
             const registerUrl = 'http://localhost:3000/register-session-key';
@@ -257,15 +258,15 @@
                     },
                     body: JSON.stringify({ bot_id: botId, session_key: sessionKey })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.code === 200) {
-                        localStorage.setItem(sessionKeyStorageKey, sessionKey);
-                        return sessionKey;
-                    } else {
-                        throw new Error('Failed to register session key: ' + data.message);
-                    }
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            localStorage.setItem(sessionKeyStorageKey, sessionKey);
+                            return sessionKey;
+                        } else {
+                            throw new Error('Failed to register session key: ' + data.message);
+                        }
+                    });
             }
 
             function loadConversation(sessionKey) {
@@ -276,16 +277,16 @@
                     },
                     body: JSON.stringify({ session_key: sessionKey })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.code === 200) {
-                        data.data.messages.forEach(message => {
-                            addMessage(message.type === 1 ? 'user' : 'bot', message.content);
-                        });
-                    } else {
-                        throw new Error('Error loading messages: ' + data.message);
-                    }
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            data.data.messages.forEach(message => {
+                                addMessage(message.type === 1 ? 'user' : 'bot', message.content);
+                            });
+                        } else {
+                            throw new Error('Error loading messages: ' + data.message);
+                        }
+                    });
             }
 
             function addMessage(role, message) {
@@ -341,20 +342,28 @@
                     },
                     body: JSON.stringify({ message: message, session_key: sessionKey })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.code === 200) {
-                        addMessage('bot', data.data.answer);
-                    } else {
-                        console.error('Error from server:', data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error sending message to bot:', error);
-                })
-                .finally(() => {
-                    toggleUI(false);
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Data", data.code)
+                        if (data === null) {
+                            console.log('Error from server:', data.message);
+                            addMessage('bot', 'Error From server');
+                        }
+                        if (data.code != 200) {
+                            addMessage('bot', data.data.answer);
+                        } else {
+                            console.log('Error from server:', data.message);
+                            addMessage('bot', 'Error From server');
+
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending message to bot:', error);
+                        addMessage('bot', 'Error From server');
+                    })
+                    .finally(() => {
+                        toggleUI(false);
+                    });
             }
 
             function toggleChatContainer() {

@@ -3,6 +3,7 @@ const moment = require('moment-timezone');
 const { convertToTimeZone, retrieveCurrency } = require('../Utils/helper');
 const { getPackageById } = require('./Package');
 const RabbitMQService = require('../Services/RabbitMQService');
+const { updateBotStatus } = require('./Bot')
 
 const domainPattern = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,24}(\/)?$/;
 
@@ -87,6 +88,35 @@ const createOrder = async (userId, packageId, unitPrice, domain) => {
     }
 };
 
+const retrainBot = async (botId) => {
+    try {
+        const selectBotQuery = `
+        SELECT * FROM bots
+        WHERE id = $1`;
+
+        const selectResult = await query(selectBotQuery, [botId]);
+        console.log('selectResult:', selectResult); // Debugging output
+        if (selectResult.rows[0] == null) {
+            console.log(`Bot with ID ${botId} not found.`);
+            return; // Or handle this case as needed
+        }
+        await updateBotStatus(botId, 2);
+        const deleteQuery = `
+        DELETE FROM documents
+        WHERE bot_id = $1`;
+
+        await query(deleteQuery, [botId]);
+        console.log("BOT QUERY", selectResult.rows[0]);
+        RabbitMQService.sendMessage('training_request', JSON.stringify(selectResult.rows[0]));
+
+
+    } catch (error) {
+        console.log("Error removing old documents", error)
+        throw error;
+    }
+}
+
 module.exports = {
     createOrder,
+    retrainBot
 };
