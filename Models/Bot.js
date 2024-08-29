@@ -24,6 +24,7 @@ const getBots = async (userId) => {
                 subscriptions s ON b.id = s.bot_id
             WHERE
                 b.user_id = $1
+            ORDER BY b.id
         `;
         const result = await query(queryText, [userId]);
 
