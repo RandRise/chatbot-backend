@@ -7,7 +7,7 @@ const fetchBots = async (req, res) => {
 
     try {
 
-        const bots = await getBots(userId);
+        const bots = await getBots(userId, req);
 
         if (bots.length === 0) {
 

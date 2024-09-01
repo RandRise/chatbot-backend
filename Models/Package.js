@@ -39,7 +39,25 @@ const getPackageById = async (packageId) => {
     };
 };
 
+const getPaidPackages = async () => {
+
+    const result = await query('SELECT * FROM packages WHERE is_default = false');
+
+    return result.rows.map(row => ({
+
+        id: row.id,
+        name: row.name,
+        msgcount: row.msgcount,
+        numofmonths: row.numofmonths,
+        formattedPrice: row.price + ' ' + retrieveCurrency(),
+        price: parseFloat(row.price),
+
+    }));
+
+};
+
 module.exports = {
     getPackages,
     getPackageById,
+    getPaidPackages,
 };

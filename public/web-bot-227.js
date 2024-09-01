@@ -1,105 +1,8 @@
-const { query } = require('../db');
-const { convertToTimeZone } = require('../Utils/helper');
-const path = require('path')
-const fs = require('fs')
-const url = require('url')
-const getBotById = async (botId) => {
 
-    const result = await query('SELECT * FROM bots WHERE id = $1', [botId]);
-    return result.rows[0];
-};
-
-const getBots = async (userId, req) => {
-    try {
-        const queryText = `
-            SELECT 
-                b.id AS bot_id,
-                b.domain,
-                b.status,
-                s.id AS subscription_id,
-                s.msgcount,
-                s.expirydate
-            FROM 
-                bots b
-            LEFT JOIN 
-                subscriptions s ON b.id = s.bot_id
-            WHERE
-                b.user_id = $1
-            ORDER BY b.id
-        `;
-        const result = await query(queryText, [userId]);
-
-        const bots = result.rows.reduce((acc, row) => {
-
-            const existingBot = acc.find(bot => bot.id === row.bot_id);
-            if (existingBot) {
-
-                existingBot.subscriptions.push({
-                    id: Number(row.subscription_id),
-                    msgcount: Number(row.msgcount),
-                    expirydate: convertToTimeZone(row.expirydate, 'Asia/Damascus')
-                });
-            } else {
-
-                acc.push({
-                    id: Number(row.bot_id),
-                    domain: row.domain,
-                    url: `${fullUrl(req)}/web-bot-${row.bot_id}.js`,
-                    status: row.status,
-                    subscriptions: row.subscription_id
-                        ? [{
-                            id: Number(row.subscription_id),
-                            msgcount: Number(row.msgcount),
-                            expirydate: convertToTimeZone(row.expirydate, 'Asia/Damascus')
-                        }]
-                        : []
-                });
-            }
-
-            return acc;
-        }, []);
-
-        return bots;
-    } catch (error) {
-
-        console.error('Error fetching bots:', error);
-        throw error;
-    }
-};
-
-function fullUrl(req) {
-    return url.format({
-        protocol: req.protocol,
-        host: req.get('host'),
-    });
-}
-
-const updateBotStatus = async (botId, newStatus) => {
-
-    try {
-        const updateQuery = `
-            UPDATE bots
-            SET status = $1
-            WHERE id = $2
-        `;
-        const result = await query(updateQuery, [newStatus, botId]);
-        return result.rowCount > 0;
-    } catch (error) {
-        console.error('Error updating bot status:', error);
-        throw error;
-    }
-};
-
-
-const generateJsFile = async (botId) => {
-
-    //Genrating JS Vanilla File (Working on it)
-
-    const embeddedJs = `
     (function () {
         // Create and inject CSS
         const style = document.createElement('style');
-        style.textContent = \`
+        style.textContent = `
             @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
     
             body {
@@ -286,7 +189,7 @@ const generateJsFile = async (botId) => {
             #chat-container.show~#chat-icon {
                 transform: translateX(100px);
             }
-        \`;
+        `;
         document.head.appendChild(style);
     
         // Create and inject HTML
@@ -298,7 +201,7 @@ const generateJsFile = async (botId) => {
     
         const chatContainer = document.createElement('div');
         chatContainer.id = 'chat-container';
-        chatContainer.innerHTML = \`
+        chatContainer.innerHTML = `
             <div id="chat-header">Customer Service AI Assistant</div>
             <div id="chat-body" aria-live="polite">
                 <div class="loader" id="loader">
@@ -319,7 +222,7 @@ const generateJsFile = async (botId) => {
                 <input type="text" id="chat-input" placeholder="Type your message...">
                 <button id="chat-send">➢</button>
             </div>
-        \`;
+        `;
         document.body.appendChild(chatContainer);
     
         // JavaScript functionality
@@ -331,7 +234,7 @@ const generateJsFile = async (botId) => {
         let sessionKey;
         let sessionInitialized = false;
     
-        const botId = ${'' + botId};
+        const botId = 227;
         const chatBody = document.getElementById('chat-body');
         const chatInput = document.getElementById('chat-input');
         const chatSend = document.getElementById('chat-send');
@@ -476,24 +379,4 @@ const generateJsFile = async (botId) => {
     
         initializeSession();
     })();
-    `;
-
-    const filePath = path.join(__dirname, '../public', `web-bot-${botId}.js`);
-
-    fs.writeFile(filePath, embeddedJs, (err) => {
-        if (err) {
-            console.error('Error writing HTML file:', err);
-            throw err;
-        }
-        console.log(`HTML file for bot ${botId} generated at ${filePath}`);
-    });
-
-    await updateBotStatus(botId, newStatus = 1)
-
-}
-module.exports = {
-    getBotById,
-    getBots,
-    updateBotStatus,
-    generateJsFile,
-};
+    
