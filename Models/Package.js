@@ -56,8 +56,30 @@ const getPaidPackages = async () => {
 
 };
 
+const getFreePackage = async () => {
+
+    const result = await query(`SELECT * FROM packages WHERE is_default = true`);
+
+    if (result.rows.length === 0) {
+
+        return null;
+    }
+    const row = result.rows[0];
+
+    return {
+        
+        id: row.id,
+        name: row.name,
+        msgcount: row.msgcount,
+        numofmonths: row.numofmonths,
+        formattedPrice: row.price + ' ' + retrieveCurrency(),
+        price: parseFloat(row.price),
+    };
+};
+
 module.exports = {
     getPackages,
     getPackageById,
     getPaidPackages,
+    getFreePackage,
 };

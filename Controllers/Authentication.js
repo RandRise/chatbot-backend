@@ -5,7 +5,7 @@ const { createResponse } = require('../Utils/responseUtils');
 
 const register = async (req, res) => {
 
-    const { firstname, lastname, email, password } = req.body;
+    const { firstname, lastname, email, password, domain } = req.body;
 
     try {
         const normalizedEmail = email.toLowerCase();
@@ -19,7 +19,7 @@ const register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await registerUser(firstname, lastname, normalizedEmail, hashedPassword);
+        const user = await registerUser(firstname, lastname, normalizedEmail, hashedPassword, domain);
 
         const token = await loginUser(user.id)
 
