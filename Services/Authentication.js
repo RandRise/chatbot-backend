@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const { getUserByEmail, createUser, updateUserVerificationCode, updateUserPassword } = require('../Models/User');
+const { placeFreeOrder } = require('./Order')
 
 const generateNumericCode = (length) => {
 
@@ -12,10 +13,14 @@ const generateNumericCode = (length) => {
     return code;
 };
 
-const registerUser = async (firstname, lastname, email, hashedPassword) => {
+const registerUser = async (firstname, lastname, email, hashedPassword, domain) => {
     try {
 
         const user = await createUser(firstname, lastname, email, hashedPassword);
+        if (user != null) {
+            console.log("User", user)
+            await placeFreeOrder(user.id, domain);
+        }
         return user;
 
     } catch (error) {
