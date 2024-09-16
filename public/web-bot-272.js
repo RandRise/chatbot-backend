@@ -234,7 +234,7 @@
         let sessionKey;
         let sessionInitialized = false;
     
-        const botId = 271;
+        const botId = 272;
         const chatBody = document.getElementById('chat-body');
         const chatInput = document.getElementById('chat-input');
         const chatSend = document.getElementById('chat-send');

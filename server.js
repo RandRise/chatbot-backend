@@ -16,6 +16,7 @@ const { generateJsFile } = require('./Models/Bot');
 const { registerSessionKey } = require('./Controllers/Session');
 const { fetchAllMessagesController } = require('./Controllers/Message')
 const {retrainChatbot} = require('./Controllers/Bot');
+const { stripePayment } = require('./Services/Order');
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.post('/send-message', sendMessage);
 app.post('/register-session-key', registerSessionKey);
 app.post('/fetch-all-messages', fetchAllMessagesController);
 app.post('/retrain-bot', verifyToken, retrainChatbot);
+app.post('/test-stripe', verifyToken, stripePayment)
 
 app.listen(port, async () => {
     console.log(`Server running on port ${port}`);
